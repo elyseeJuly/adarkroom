@@ -44,8 +44,9 @@ var Terminal = {
         $('<div>').attr('id', 'spark-controls').appendTo($panel);
         $('#ee-left').prepend($panel);
 
-        // Subscribe to phase changes
+        // Subscribe to phase and state changes
         $.Dispatch('phaseChange').subscribe(Terminal.handlePhaseChange);
+        $.Dispatch('stateUpdate').subscribe(Terminal.handleStateUpdates);
 
         // Set up based on current phase
         if (phase === Engine.PHASES.NULL) {
@@ -186,6 +187,18 @@ var Terminal = {
             Terminal.typeNarrative(Terminal._NARRATIVES.campUnlock, function () {
                 Terminal.showPostSparkPhase();
             });
+        }
+    },
+
+    // ── State Change Handler ────────────────────────────────
+
+    handleStateUpdates: function (e) {
+        if (e && e.path && e.path.indexOf('stores') === 0) {
+            var $counter = $('#ember-counter .count');
+            if ($counter.length > 0) {
+                var currentEmber = $SM.get('stores.ember') || 0;
+                $counter.text(Math.floor(currentEmber));
+            }
         }
     },
 

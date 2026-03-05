@@ -506,6 +506,10 @@
     handleStateUpdates: function (e) {
       // Check for phase unlock on any state change
       Engine.checkPhaseUnlock();
+
+      if (e && e.path && e.path.indexOf('stores') === 0) {
+        Engine.updateStoresView();
+      }
     }
   };
 
