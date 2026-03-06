@@ -32,6 +32,18 @@ var Terminal = {
             '结构节点自动组装协议启动。',
             '检测到生命信号。<span class="highlight">迷失者</span>正在接近。',
             '基础设施模块已解锁。'
+        ],
+        extract: [
+            '余烬被收集。终端温度微升。',
+            '能量脉冲稳定。低维算力积累中。',
+            '热残留捕获完成。防御矩阵持续运转。',
+            '余烬在指尖凝聚，驱散了一寸黑暗。',
+            '信号增强。主神的探针暂时偏转。',
+            '// 余烬收集协议执行完毕。',
+            '微弱的光。总比没有要好。',
+            '每一粒余烬都是对热寂的一次抵抗。',
+            '系统温度：临界值以上。终端继续运行。',
+            '收集完成。黑暗尚未吞噬这里。'
         ]
     },
 
@@ -107,7 +119,7 @@ var Terminal = {
                     Terminal.typeNarrative(Terminal._NARRATIVES.spark, function () {
                         Terminal.showExtractButton();
                     });
-                }, 800);
+                }, 400);
             });
         } else {
             // Already in spark phase, just show the button
@@ -130,16 +142,22 @@ var Terminal = {
         $btn.addClass('ee-btn--primary');
         $controls.append($btn);
 
-        // Show ember counter
-        var $counter = $('<div>').attr('id', 'ember-counter');
-        $('<span>').text('余烬: ').appendTo($counter);
-        $('<span>').addClass('count').text($SM.get('stores.ember') || 0).appendTo($counter);
-        $controls.append($counter);
+        // Show ember counter (guard against duplicate)
+        var $counter = $('#ember-counter');
+        if ($counter.length === 0) {
+            $counter = $('<div>').attr('id', 'ember-counter');
+            $('<span>').text('余烬: ').appendTo($counter);
+            $('<span>').addClass('count').text($SM.get('stores.ember') || 0).appendTo($counter);
+            $controls.append($counter);
 
-        // Make counter visible after short delay
-        setTimeout(function () {
-            $counter.addClass('visible');
-        }, 300);
+            // Make counter visible after short delay
+            setTimeout(function () {
+                $counter.addClass('visible');
+            }, 300);
+        } else {
+            // Re-attach to controls if needed
+            $controls.append($counter);
+        }
     },
 
     extractEmber: function () {
@@ -155,6 +173,24 @@ var Terminal = {
         var $flash = $('<div>').addClass('extract-flash active');
         $('#btn-extract').append($flash);
         setTimeout(function () { $flash.remove(); }, 500);
+
+        // Show a random extract narrative line in the terminal
+        var lines = Terminal._NARRATIVES.extract;
+        var line = lines[Math.floor(Math.random() * lines.length)];
+        var $narrative = $('#terminal-narrative');
+        // rAF + forced reflow ensures fadeInUp animation fires reliably
+        requestAnimationFrame(function () {
+            var $p = $('<p>').html(line);
+            $p.css({ 'animation': 'none', 'opacity': '0' });
+            $narrative.append($p);
+            void $p[0].offsetWidth;
+            $p.css({ 'animation': '', 'opacity': '' });
+            // Keep narrative area clean — max 4 lines visible
+            var $all = $narrative.find('p');
+            if ($all.length > 4) {
+                $all.first().fadeOut(300, function () { $(this).remove(); });
+            }
+        });
 
         // Notify
         Notifications.notify('+' + amount + ' 余烬');
@@ -214,12 +250,20 @@ var Terminal = {
                 return;
             }
 
-            var $p = $('<p>').html(lines[index]);
-            $p.css('animation-delay', '0s');
-            $narrative.append($p);
+            var lineHtml = lines[index];
             index++;
 
-            setTimeout(showNext, 600);
+            // Use rAF + forced reflow to guarantee CSS animation triggers
+            // on dynamically-inserted elements in all browsers
+            requestAnimationFrame(function () {
+                var $p = $('<p>').html(lineHtml);
+                // Temporarily disable animation, append, force paint, re-enable
+                $p.css({ 'animation': 'none', 'opacity': '0' });
+                $narrative.append($p);
+                void $p[0].offsetWidth; // force reflow
+                $p.css({ 'animation': '', 'opacity': '' });
+                setTimeout(showNext, 600);
+            });
         }
 
         showNext();

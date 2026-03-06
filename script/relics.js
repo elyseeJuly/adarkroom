@@ -26,6 +26,8 @@ var Relics = {
         $('<div>').addClass('relic-sub-title').text('▸ 已解译遗物').appendTo($panel);
         $('<div>').attr('id', 'relic-list').addClass('relic-list').appendTo($panel);
 
+        // Always hidden until MAP phase is reached
+        $panel.hide();
         $('#ee-right').append($panel);
 
         if (Engine.getPhase() >= Engine.PHASES.MAP) Relics.show();
@@ -36,7 +38,7 @@ var Relics = {
         Relics.updateView();
     },
 
-    show: function () { $('#relic-panel').addClass('visible'); },
+    show: function () { $('#relic-panel').stop(true).fadeIn(400); },
 
     updateView: function () {
         Relics._renderFragments();
@@ -190,11 +192,17 @@ var Relics = {
     },
 
     handlePhaseChange: function (e) {
-        if (e.to >= Engine.PHASES.MAP) { Relics.show(); Relics.updateView(); }
+        if (e.to >= Engine.PHASES.MAP) {
+            Relics.show();
+            Relics.updateView();
+        }
     },
 
     handleStateUpdates: function (e) {
-        if (e && e.path && (e.path === 'relicInventory' || e.path === 'fragmentInventory' || e.path === 'buildings')) {
+        if (!e || !e.path) return;
+        var path = e.path;
+        if (path === 'relicInventory' || path === 'fragmentInventory' ||
+            path === 'buildings' || path.indexOf('buildings.') === 0) {
             Relics.updateView();
         }
     }

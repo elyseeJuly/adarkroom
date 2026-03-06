@@ -83,6 +83,7 @@
     _tickTimer: null,
     _saveTimer: null,
     _incomeTimer: null,
+    _ambientTick: 0,
 
     /**
      * Initialize the engine
@@ -174,8 +175,59 @@
       // Update stores display
       Engine.updateStoresView();
 
+      // Process ambient logs (every 45 seconds)
+      Engine._ambientTick++;
+      if (Engine._ambientTick >= 45) {
+        Engine._ambientTick = 0;
+        Engine.processAmbientLogs();
+      }
+
       // Fire the tick event for any listeners
       $.Dispatch('tick').publish();
+    },
+
+    /**
+     * Determine if an ambient text log should be broadcasted based on state
+     */
+    processAmbientLogs: function () {
+      var phase = Engine.getPhase();
+      if (phase < Engine.PHASES.SPARK) return; // SPARK is the start of interaction
+
+      var possibleLines = [];
+      var dict = (typeof Narrative !== 'undefined' && Narrative.dict && Narrative.dict.ambientLogs) ? Narrative.dict.ambientLogs : null;
+      if (!dict) return;
+
+      // 1. Ember checks
+      var ember = $SM.get('stores.ember') || 0;
+      var emberCap = $SM.getStorageCap('ember') || 100;
+      var emberMin = Math.max(20, emberCap * 0.2); // Below 20% or 20
+
+      if (ember < emberMin && dict.ember_low) {
+        possibleLines = possibleLines.concat(dict.ember_low);
+      } else if (ember > emberCap * 0.8 && dict.ember_high) {
+        possibleLines = possibleLines.concat(dict.ember_high);
+      }
+
+      // 2. SAN checks
+      if (phase >= Engine.PHASES.ABYSS) {
+        var san = $SM.get('character.san');
+        if (san !== undefined && san !== null) {
+          if (san > 70 && dict.san_assimilated) {
+            possibleLines = possibleLines.concat(dict.san_assimilated);
+          } else if (san < 30 && dict.san_madness) {
+            possibleLines = possibleLines.concat(dict.san_madness);
+          } else if (dict.san_awakened) {
+            possibleLines = possibleLines.concat(dict.san_awakened);
+          }
+        }
+      }
+
+      if (possibleLines.length > 0) {
+        var idx = Math.floor(Math.random() * possibleLines.length);
+        if (typeof Notifications !== 'undefined') {
+          Notifications.notify(possibleLines[idx]);
+        }
+      }
     },
 
     // ── Phase Management ──────────────────────────────────────
