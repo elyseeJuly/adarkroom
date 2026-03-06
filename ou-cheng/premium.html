@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>高级功能 - 偶成诗词创作</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+KuaiLe&family=Crimson+Text&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --paper-white: #F7F1E3;
+            --ink-black: rgba(26, 26, 26, 0.85);
+            --cinnabar-red: #B22222;
+            --ink-green: #2d5a3d;
+            --gold: #d4af37;
+            --gray: #666666;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --error: #f44336;
+            --plum-pink: #F5E6E8;
+            --cloud-blue: #E6F3F7;
+            --bamboo-green: #E8F5E8;
+            --lotus-purple: #F0E6F5;
+        }
+
+        body {
+            font-family: 'Ma Shan Zheng', serif;
+            background: var(--paper-white);
+            color: var(--ink-black);
+            line-height: 1.6;
+            background-image: url('resources/xuan-paper-bg.png');
+            background-size: cover;
+            background-attachment: fixed;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(247, 241, 227, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(178, 34, 34, 0.2);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--cinnabar-red);
+        }
+
+        .logo-img {
+            width: 32px;
+            height: 32px;
+            margin-right: 8px;
+            background: var(--cinnabar-red);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: var(--cinnabar-red);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        .back-btn:hover {
+            background: #8b0000;
+            transform: scale(1.1);
+        }
+
+        /* Main Content */
+        .main {
+            margin-top: 70px;
+            margin-bottom: 80px;
+            min-height: calc(100vh - 150px);
+            padding: 20px 0;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-family: 'ZCOOL KuaiLe', cursive;
+            font-size: 32px;
+            color: var(--cinnabar-red);
+            margin-bottom: 15px;
+        }
+
+        .page-subtitle {
+            font-size: 16px;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+
+        /* User Info */
+        .user-info {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 30px var(--shadow);
+            border: 1px solid rgba(178, 34, 34, 0.1);
+            text-align: center;
+        }
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            background: var(--cinnabar-red);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        .user-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--ink-black);
+            margin-bottom: 5px;
+        }
+
+        .user-level {
+            font-size: 14px;
+            color: var(--cinnabar-red);
+            margin-bottom: 10px;
+        }
+
+        .user-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--cinnabar-red);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        /* VIP Status */
+        .vip-status {
+            background: linear-gradient(135deg, var(--gold), #b8941f);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .vip-status::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .vip-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .vip-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .vip-desc {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+
+        .vip-expiry {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        /* Product Sections */
+        .product-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            color: var(--cinnabar-red);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 30px var(--shadow);
+            border: 1px solid rgba(178, 34, 34, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px var(--shadow);
+        }
+
+        .product-card.premium {
+            border: 2px solid var(--gold);
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.05), rgba(212, 175, 55, 0.1));
+        }
+
+        .product-badge {
+            position: absolute;
+            top: -8px;
+            right: 15px;
+            background: var(--gold);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .product-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--cinnabar-red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 24px;
+            color: white;
+        }
+
+        .product-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--cinnabar-red);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .product-desc {
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .product-features {
+            list-style: none;
+            margin-bottom: 15px;
+        }
+
+        .product-features li {
+            font-size: 12px;
+            color: var(--ink-green);
+            margin-bottom: 5px;
+            padding-left: 16px;
+            position: relative;
+        }
+
+        .product-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .product-price {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .price-amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--cinnabar-red);
+        }
+
+        .price-unit {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .original-price {
+            font-size: 14px;
+            color: var(--gray);
+            text-decoration: line-through;
+            margin-left: 8px;
+        }
+
+        .buy-button {
+            width: 100%;
+            padding: 12px;
+            background: var(--cinnabar-red);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Ma Shan Zheng', serif;
+        }
+
+        .buy-button:hover {
+            background: #8b0000;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(178, 34, 34, 0.3);
+        }
+
+        .buy-button.premium {
+            background: var(--gold);
+        }
+
+        .buy-button.premium:hover {
+            background: #b8941f;
+        }
+
+        /* Subscription Section */
+        .subscription-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 30px var(--shadow);
+            border: 1px solid rgba(178, 34, 34, 0.1);
+            text-align: center;
+        }
+
+        .subscription-title {
+            font-size: 24px;
+            color: var(--cinnabar-red);
+            margin-bottom: 15px;
+        }
+
+        .subscription-desc {
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .subscription-price {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--cinnabar-red);
+            margin-bottom: 10px;
+        }
+
+        .subscription-unit {
+            font-size: 16px;
+            color: var(--gray);
+        }
+
+        .subscription-benefits {
+            list-style: none;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .subscription-benefits li {
+            font-size: 14px;
+            color: var(--ink-green);
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .subscription-benefits li::before {
+            content: '✨';
+            position: absolute;
+            left: 0;
+        }
+
+        .subscribe-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--gold), #b8941f);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Ma Shan Zheng', serif;
+        }
+
+        .subscribe-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+        }
+
+        /* Free Features */
+        .free-features {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 30px var(--shadow);
+            border: 1px solid rgba(178, 34, 34, 0.1);
+        }
+
+        .free-features-title {
+            font-size: 20px;
+            color: var(--cinnabar-red);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: var(--paper-white);
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--ink-green);
+        }
+
+        .feature-icon {
+            font-size: 16px;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(247, 241, 227, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 10px 0;
+            border-top: 1px solid rgba(178, 34, 34, 0.2);
+        }
+
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--ink-black);
+            transition: all 0.3s ease;
+            padding: 5px;
+        }
+
+        .nav-item.active {
+            color: var(--cinnabar-red);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .nav-label {
+            font-size: 10px;
+            text-align: center;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            max-width: 350px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            color: var(--cinnabar-red);
+            margin-bottom: 15px;
+        }
+
+        .modal-message {
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn.primary {
+            background: var(--cinnabar-red);
+            color: white;
+        }
+
+        .modal-btn.secondary {
+            background: var(--gray);
+            color: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-title {
+                font-size: 28px;
+            }
+            
+            .subscription-price {
+                font-size: 28px;
+            }
+        }
+
+        /* Animation Classes */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .slide-in-left {
+            opacity: 0;
+            transform: translateX(-50px);
+        }
+
+        .slide-in-right {
+            opacity: 0;
+            transform: translateX(50px);
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: white;
+            border-radius: 8px;
+            padding: 12px 16px;
+            box-shadow: 0 8px 30px var(--shadow);
+            border-left: 4px solid var(--cinnabar-red);
+            z-index: 10000;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            max-width: 300px;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .notification-icon {
+            font-size: 16px;
+        }
+
+        .notification-message {
+            font-size: 14px;
+            flex: 1;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: var(--gray);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-img">偶</div>
+                偶成
+            </div>
+            <button class="back-btn" onclick="history.back()">←</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <div class="page-header fade-in">
+                <h1 class="page-title">高级功能</h1>
+                <p class="page-subtitle">解锁更多创作可能</p>
+            </div>
+
+            <!-- User Info -->
+            <div class="user-info fade-in">
+                <div class="user-avatar">诗</div>
+                <div class="user-name">诗词爱好者</div>
+                <div class="user-level">普通用户</div>
+                <div class="user-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">15</div>
+                        <div class="stat-label">作品数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">3</div>
+                        <div class="stat-label">连续天数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">128</div>
+                        <div class="stat-label">积分</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIP Status -->
+            <div class="vip-status fade-in" id="vipStatus">
+                <div class="vip-icon">👑</div>
+                <div class="vip-title">VIP会员</div>
+                <div class="vip-desc">解锁全部高级功能，享受尊贵体验</div>
+                <div class="vip-expiry">有效期至：2025-12-31</div>
+            </div>
+
+            <!-- Subscription -->
+            <div class="subscription-section fade-in">
+                <h2 class="subscription-title">🌟 VIP会员订阅</h2>
+                <p class="subscription-desc">成为VIP会员，畅享所有高级功能，让诗词创作更加得心应手</p>
+                <div class="subscription-price">
+                    <span class="price-amount">¥28</span>
+                    <span class="subscription-unit">/月</span>
+                </div>
+                <ul class="subscription-benefits">
+                    <li>解锁所有高级字体和图章样式</li>
+                    <li>使用全部背景纸张和花笺样式</li>
+                    <li>高清海报导出无水印</li>
+                    <li>AI智能点评无限次使用</li>
+                    <li>云端作品同步和备份</li>
+                    <li>优先体验新功能</li>
+                </ul>
+                <button class="subscribe-button" id="subscribeBtn">立即订阅</button>
+            </div>
+
+            <!-- Premium Fonts -->
+            <div class="product-section fade-in">
+                <h3 class="section-title">✒️ 高级字体</h3>
+                <div class="product-grid">
+                    <div class="product-card premium">
+                        <div class="product-badge">VIP</div>
+                        <div class="product-icon">🖋️</div>
+                        <h4 class="product-title">名家书法字体集</h4>
+                        <p class="product-desc">包含王羲之、颜真卿、苏轼等历代名家书法字体复刻</p>
+                        <ul class="product-features">
+                            <li>12种经典书法字体</li>
+                            <li>支持竖排和横排</li>
+                            <li>完美还原毛笔质感</li>
+                            <li>适合正式作品使用</li>
+                        </ul>
+                        <div class="product-price">
+                            <span class="price-amount">¥18</span>
+                            <span class="price-unit">永久</span>
+                        </div>
+                        <button class="buy-button premium" data-product="calligraphy-fonts">立即购买</button>
+                    </div>
+
+                    <div class="product-card premium">
+                        <div class="product-badge">VIP</div>
+                        <div class="product-icon">📜</div>
+                        <h4 class="product-title">古籍刻本字体</h4>
+                        <p class="product-desc">仿宋、仿刻本等古籍专用字体，还原古典印刷效果</p>
+                        <ul class="product-features">
+                            <li>8种古籍刻本字体</li>
+                            <li>包含缺字和异体字</li>
+                            <li>古籍排版专用</li>
+                            <li>学术研究推荐</li>
+                        </ul>
+                        <div class="product-price">
+                            <span class="price-amount">¥12</span>
+                            <span class="price-unit">永久</span>
+                        </div>
+                        <button class="buy-button premium" data-product="ancient-fonts">立即购买</button>
+                    </div>
+
+                    <div class="product-card premium">
+                        <div class="product-badge">VIP</div>
+                        <div class="product-icon">🏛️</div>
+                        <h4 class="product-title">宫廷御用字体</h4>
+                        <p class="product-desc">清代宫廷档案、诏书专用字体，彰显皇家气派</p>
+                        <ul class="product-features">
+                            <li>6种宫廷专用字体</li>
+                            <li>官方文书风格</li>
+                            <li>庄重典雅设计</li>
+                            <li>特殊场合推荐</li>
+                        </ul>
+                        <div class="product-price">
+                            <span class="price-amount">¥25</span>
+                            <span class="price-unit">永久</span>
+                            <span class="original-price">¥35</span>
+                        </div>
+                        <button class="buy-button premium" data-product="palace-fonts">立即购买</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Premium Seals -->
+            <div class="product-section fade-in">
+                <h3 class="section-title">🎋 高级图章</h3>
+                <div class="product-grid">
+                    <div class="product-card premium">
+                        <div class="product-badge">VIP</div>
+                        <div class="product-icon">🏛️</div>
+                        <h4 class="product-title">宫廷印章集</h4>
+                        <p class="product-desc">清代皇帝、皇后御用印章样式，尽显皇家威严</p>
+                        <ul class="product-features">
+                            <li>15枚宫廷印章</li>
+                            <li>皇帝玉玺样式</li>
+                            <li>皇后凤印样式</li>
+                            <li>多种材质效果</li>
+                        </ul>
+                        <div class="product-price">
+                            <span class="price-amount">¥15</span>
+                            <span class="price-unit">永久</span>
+                        </div>
+                        <button class="buy-button premium" data-product="palace-seals">立即购买</button>
+                    </div>
+
+                    <div class="product-card premium">
+                        <div class="product-badge">VIP</div>
+                        <div class="product-icon">🎋</div>
+                        <h4 class="product-title">文人印章集</h4>
+                        <p class="product-desc">历代文人墨客常用印章，展现文人雅士风范</p>
+                        <ul class="product-features">
+                            <li>20枚文人印章</li>
+                            <li>名家篆刻复刻</li>
+                            <li>多种书法风格</li>
+                            <li>雅致文人气息</li>
+                        </ul>
+                        <div class="product-price">
+                            <span class="price-amount">¥12</span>
+                            <span class="price-unit">永久</span>
+                        </div>
+                        <button class="buy-button premium" data-product="scholar-seals">立即购买</button>
+                    </div>
+
+                    <div class="product-card premium">
+                        <div class="product-badge">VIP</div>
+                        <div class="product-icon">🐉</div>
+                        <h4 class="product-title">神兽印章集</h4>
+                        <p class="product-desc">龙、凤、麒麟等神兽图案印章，寓意吉祥如意</p>
+                        <ul class="product-features">
+                            <li>12枚神兽印章</li>
+                            <li>传统吉祥图案</li>
+                            <li>精美雕刻工艺</li>
+                            <li>特殊场合专用</li>
+                        </ul>
+                        <div class="product-price">
+                            <span class="price-amount">¥20</span>
+                            <span class="price-unit">永久</span>
+                        </div>
+                        <button class="buy-button premium" data-product="mythical-seals">立即购买</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Premium Backgrounds -->
+            <div class="product-section fade-in">
+                <h3 class="section-title">🎨 高级背景</h3>
+                <div class="product-grid">
+                    <div class="product-card premium">
+                        <div class="product-badge">VIP</div>
+                        <div class="product-icon">🏮</div>
+                        <h4 class="product-title">古代名纸复刻</h4>
+                        <p class="product-desc">宋代澄心堂纸、明代宣德纸等名纸纹理复刻</p>
+                        <ul class="product-features">
+                            <li>10种古代名纸</li>
+                            <li>历史文献考证</li>
+                            <li>真实纹理还原</li>
+                            <li>收藏级别品质</li>
+                        </ul>
+                        <div class="product-price">
+                            <span class="price-amount">¥16</span>
+                            <span class="price-unit">永久</span>
+                        </div>
+                        <button class="buy-button premium" data-product="ancient-papers">立即购买</button>
+                    </div>
+
+                    <div class="product-card premium">
+                        <div class="product-badge">VIP</div>
+                        <div class="product-icon">🌸</div>
+                        <h4 class="product-title">四季花笺集</h4>
+                        <p class="product-desc">春花、夏荷、秋菊、冬梅四季主题花笺纸</p>
+                        <ul class="product-features">
+                            <li>16种季节花笺</li>
+                            <li>四季主题设计</li>
+                            <li>色彩丰富多样</li>
+                            <li>应景创作推荐</li>
+                        </ul>
+                        <div class="product-price">
+                            <span class="price-amount">¥14</span>
+                            <span class="price-unit">永久</span>
+                        </div>
+                        <button class="buy-button premium" data-product="seasonal-papers">立即购买</button>
+                    </div>
+
+                    <div class="product-card premium">
+                        <div class="product-badge">VIP</div>
+                        <div class="product-icon">🎭</div>
+                        <h4 class="product-title">节日特辑背景</h4>
+                        <p class="product-desc">春节、中秋、端午等传统节日主题背景</p>
+                        <ul class="product-features">
+                            <li>12个节日主题</li>
+                            <li>传统文化元素</li>
+                            <li>节日氛围浓厚</li>
+                            <li>应节创作佳品</li>
+                        </ul>
+                        <div class="product-price">
+                            <span class="price-amount">¥18</span>
+                            <span class="price-unit">永久</span>
+                            <span class="original-price">¥25</span>
+                        </div>
+                        <button class="buy-button premium" data-product="festival-papers">立即购买</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Free Features -->
+            <div class="free-features fade-in">
+                <h3 class="free-features-title">🆓 免费功能</h3>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <span class="feature-icon">✍️</span>
+                        <span>基础诗词创作</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">📜</span>
+                        <span>竖排横排切换</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🎨</span>
+                        <span>基础背景选择</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🔍</span>
+                        <span>格律检查</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">💾</span>
+                        <span>本地作品保存</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">📚</span>
+                        <span>经典诗词赏读</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🔍</span>
+                        <span>全文搜索</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">📱</span>
+                        <span>移动端优化</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="nav-items">
+            <a href="mobile.html" class="nav-item">
+                <div class="nav-icon">🏠</div>
+                <div class="nav-label">首页</div>
+            </a>
+            <a href="mobile.html#create" class="nav-item">
+                <div class="nav-icon">✍️</div>
+                <div class="nav-label">创作</div>
+            </a>
+            <a href="works.html" class="nav-item">
+                <div class="nav-icon">📜</div>
+                <div class="nav-label">作品</div>
+            </a>
+            <a href="premium.html" class="nav-item active">
+                <div class="nav-icon">👑</div>
+                <div class="nav-label">高级</div>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Purchase Modal -->
+    <div class="modal" id="purchaseModal">
+        <div class="modal-content">
+            <h3 class="modal-title">确认购买</h3>
+            <p class="modal-message" id="purchaseMessage">您确定要购买此商品吗？</p>
+            <div class="modal-buttons">
+                <button class="modal-btn secondary" id="cancelPurchase">取消</button>
+                <button class="modal-btn primary" id="confirmPurchase">确认购买</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 通知管理器
+        const NotificationManager = {
+            show(message, type = 'info', duration = 3000) {
+                const notification = document.createElement('div');
+                notification.className = `notification notification-${type}`;
+                notification.innerHTML = `
+                    <div class="notification-content">
+                        <span class="notification-icon">${this.getIcon(type)}</span>
+                        <span class="notification-message">${message}</span>
+                        <button class="notification-close">&times;</button>
+                    </div>
+                `;
+
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.classList.add('show');
+                }, 10);
+
+                notification.querySelector('.notification-close').addEventListener('click', () => {
+                    this.hide(notification);
+                });
+
+                if (duration > 0) {
+                    setTimeout(() => {
+                        this.hide(notification);
+                    }, duration);
+                }
+
+                return notification;
+            },
+
+            hide(notification) {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            },
+
+            getIcon(type) {
+                const icons = {
+                    success: '✓',
+                    error: '✕',
+                    warning: '⚠',
+                    info: 'ℹ'
+                };
+                return icons[type] || icons.info;
+            }
+        };
+
+        // 购买管理器
+        const PurchaseManager = {
+            products: {
+                'calligraphy-fonts': { name: '名家书法字体集', price: 18 },
+                'ancient-fonts': { name: '古籍刻本字体', price: 12 },
+                'palace-fonts': { name: '宫廷御用字体', price: 25 },
+                'palace-seals': { name: '宫廷印章集', price: 15 },
+                'scholar-seals': { name: '文人印章集', price: 12 },
+                'mythical-seals': { name: '神兽印章集', price: 20 },
+                'ancient-papers': { name: '古代名纸复刻', price: 16 },
+                'seasonal-papers': { name: '四季花笺集', price: 14 },
+                'festival-papers': { name: '节日特辑背景', price: 18 }
+            },
+
+            init() {
+                this.setupEventListeners();
+            },
+
+            setupEventListeners() {
+                // 购买按钮事件
+                document.querySelectorAll('.buy-button').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const productId = e.target.dataset.product;
+                        this.showPurchaseModal(productId);
+                    });
+                });
+
+                // 订阅按钮事件
+                document.getElementById('subscribeBtn').addEventListener('click', () => {
+                    this.subscribeVIP();
+                });
+
+                // 模态框按钮事件
+                document.getElementById('cancelPurchase').addEventListener('click', () => {
+                    this.hidePurchaseModal();
+                });
+
+                document.getElementById('confirmPurchase').addEventListener('click', () => {
+                    this.confirmPurchase();
+                });
+            },
+
+            showPurchaseModal(productId) {
+                const product = this.products[productId];
+                if (!product) return;
+
+                const modal = document.getElementById('purchaseModal');
+                const message = document.getElementById('purchaseMessage');
+                
+                message.textContent = `您确定要购买"${product.name}"吗？价格：¥${product.price}`;
+                modal.classList.add('show');
+
+                // 保存当前产品ID
+                modal.dataset.productId = productId;
+            },
+
+            hidePurchaseModal() {
+                const modal = document.getElementById('purchaseModal');
+                modal.classList.remove('show');
+                modal.dataset.productId = '';
+            },
+
+            confirmPurchase() {
+                const modal = document.getElementById('purchaseModal');
+                const productId = modal.dataset.productId;
+                const product = this.products[productId];
+
+                if (!product) return;
+
+                this.hidePurchaseModal();
+                
+                // 模拟购买过程
+                NotificationManager.show('正在处理购买...', 'info');
+                
+                setTimeout(() => {
+                    // 模拟购买成功
+                    if (Math.random() > 0.1) { // 90% 成功率
+                        NotificationManager.show(`购买成功！已获得${product.name}`, 'success');
+                        this.updateUserStatus();
+                    } else {
+                        NotificationManager.show('购买失败，请重试', 'error');
+                    }
+                }, 2000);
+            },
+
+            subscribeVIP() {
+                NotificationManager.show('正在处理VIP订阅...', 'info');
+                
+                setTimeout(() => {
+                    NotificationManager.show('VIP订阅成功！欢迎成为VIP会员', 'success');
+                    this.updateVIPStatus();
+                }, 2000);
+            },
+
+            updateUserStatus() {
+                // 更新用户积分等状态
+                const currentStats = {
+                    works: 15,
+                    days: 3,
+                    points: 128
+                };
+                
+                // 模拟购买后增加积分
+                const newPoints = currentStats.points + 10;
+                document.querySelector('.stat-item:last-child .stat-number').textContent = newPoints;
+            },
+
+            updateVIPStatus() {
+                // 更新VIP状态
+                const vipStatus = document.getElementById('vipStatus');
+                vipStatus.querySelector('.vip-title').textContent = 'VIP会员 ✓';
+                vipStatus.querySelector('.vip-desc').textContent = '您已是尊贵的VIP会员，享受所有高级功能';
+            }
+        };
+
+        // 动画管理器
+        const AnimationManager = {
+            fadeIn(elements, options = {}) {
+                const defaults = {
+                    duration: 600,
+                    delay: 0,
+                    easing: 'easeOutQuart'
+                };
+                const config = { ...defaults, ...options };
+
+                return anime({
+                    targets: elements,
+                    opacity: [0, 1],
+                    translateY: [30, 0],
+                    duration: config.duration,
+                    delay: config.delay,
+                    easing: config.easing
+                });
+            },
+
+            stagger(elements, options = {}) {
+                const defaults = {
+                    duration: 600,
+                    delay: anime.stagger(100),
+                    easing: 'easeOutQuart'
+                };
+                const config = { ...defaults, ...options };
+
+                return anime({
+                    targets: elements,
+                    opacity: [0, 1],
+                    translateY: [30, 0],
+                    duration: config.duration,
+                    delay: config.delay,
+                    easing: config.easing
+                });
+            }
+        };
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            PurchaseManager.init();
+            
+            // 页面加载动画
+            setTimeout(() => {
+                AnimationManager.fadeIn('.fade-in');
+            }, 300);
+        });
+    </script>
+</body>
+</html>
