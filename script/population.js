@@ -110,7 +110,7 @@ var Population = {
     },
 
     show: function () {
-        $('#worker-panel').addClass('visible');
+        $('#worker-panel').show();
     },
 
     // ── Population ──────────────────────────────────────────

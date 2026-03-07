@@ -191,7 +191,7 @@ var Nexus = {
     },
 
     show: function () {
-        $('#nexus-panel').addClass('visible');
+        $('#nexus-panel').show();
     },
 
     hide: function () {
