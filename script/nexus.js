@@ -179,7 +179,7 @@ var Nexus = {
 
         // Show if phase is CAMP or higher
         if (Engine.getPhase() >= Engine.PHASES.CAMP) {
-            Nexus.show();
+            Engine.travelTo(Nexus);
         }
 
         // Subscribe to phase changes
@@ -190,12 +190,20 @@ var Nexus = {
         Nexus.updateBuildList();
     },
 
+    name: '营地',
+    tabId: 'tab-nexus',
+
     show: function () {
         $('#nexus-panel').show();
+        if (typeof Population !== 'undefined') Population.show();
+        if ($('#tab-nexus').length === 0) {
+            Header.addLocation('营地', 'nexus', Nexus);
+        }
     },
 
     hide: function () {
-        $('#nexus-panel').removeClass('visible');
+        $('#nexus-panel').hide();
+        if (typeof Population !== 'undefined') Population.hide();
     },
 
     /**
@@ -325,7 +333,7 @@ var Nexus = {
 
     handlePhaseChange: function (e) {
         if (e.to >= Engine.PHASES.CAMP) {
-            Nexus.show();
+            Engine.travelTo(Nexus);
             Nexus.updateBuildList();
         }
     },

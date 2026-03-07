@@ -343,6 +343,16 @@
         $('#' + module.tabId).addClass('active');
       }
 
+      // Hide old module
+      if (oldModule && oldModule.hide) {
+        oldModule.hide();
+      }
+
+      // Show new module
+      if (module && module.show) {
+        module.show();
+      }
+
       // Call onArrival
       if (module && module.onArrival) {
         module.onArrival();

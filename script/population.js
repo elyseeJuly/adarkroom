@@ -96,7 +96,6 @@ var Population = {
 
         // Show if phase is CAMP or higher
         if (Engine.getPhase() >= Engine.PHASES.CAMP) {
-            Population.show();
             Population.startPopGrowth();
         }
 
@@ -111,6 +110,10 @@ var Population = {
 
     show: function () {
         $('#worker-panel').show();
+    },
+
+    hide: function () {
+        $('#worker-panel').hide();
     },
 
     // ── Population ──────────────────────────────────────────
