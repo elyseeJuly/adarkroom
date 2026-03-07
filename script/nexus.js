@@ -195,6 +195,8 @@ var Nexus = {
 
     show: function () {
         $('#nexus-panel').show();
+        // Allow a tiny delay for display:block to apply before adding class to trigger the CSS transition
+        setTimeout(function () { $('#nexus-panel').addClass('visible'); }, 10);
         if (typeof Population !== 'undefined') Population.show();
         if ($('#tab-nexus').length === 0) {
             Header.addLocation('营地', 'nexus', Nexus);
@@ -202,7 +204,8 @@ var Nexus = {
     },
 
     hide: function () {
-        $('#nexus-panel').hide();
+        $('#nexus-panel').removeClass('visible');
+        setTimeout(function () { $('#nexus-panel').hide(); }, 300); // 300ms matches --transition-slow
         if (typeof Population !== 'undefined') Population.hide();
     },
 

@@ -110,10 +110,12 @@ var Population = {
 
     show: function () {
         $('#worker-panel').show();
+        setTimeout(function () { $('#worker-panel').addClass('visible'); }, 10);
     },
 
     hide: function () {
-        $('#worker-panel').hide();
+        $('#worker-panel').removeClass('visible');
+        setTimeout(function () { $('#worker-panel').hide(); }, 300);
     },
 
     // ── Population ──────────────────────────────────────────
