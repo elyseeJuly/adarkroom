@@ -151,24 +151,64 @@ var Nexus = {
                     return;
                 }
 
-                var input = prompt('输入携带的高能浓缩液数量 (最大储备: ' + Math.floor(baseConc) + '):', Math.min(10, Math.floor(baseConc)));
-                if (input === null) return; // cancelled
+                var $overlay = $('<div>').attr('id', 'deploy-overlay').css({
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'rgba(10, 10, 15, 0.85)', zIndex: 9999,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    opacity: 0, transition: 'opacity 0.2s'
+                }).appendTo('body');
 
-                var amount = parseInt(input, 10);
-                if (isNaN(amount) || amount <= 0) return;
-                if (amount > baseConc) amount = baseConc;
+                var $panel = $('<div>').addClass('merchant-panel').appendTo($overlay);
+                $('<div>').addClass('merchant-title').text('配置携带物资').appendTo($panel);
 
-                // Execute deploy
-                $SM.add('stores.concentrate', -amount);
-                Survival.supplies = amount;
+                var $row = $('<div>').addClass('ee-store-row').css({ 'margin-bottom': '20px', 'display': 'flex', 'justify-content': 'space-between', 'align-items': 'center' }).appendTo($panel);
+                $('<span>').addClass('ee-store-name').text('高能浓缩液 (最大: ' + Math.floor(baseConc) + ')').appendTo($row);
 
-                // Go to Map Panel
-                if ($('#tab-rift_map').length > 0) {
-                    $('#tab-rift_map').click();
-                } else {
-                    Engine.switchTab('rift_map');
-                }
-                Notifications.notify('坐标锁定，裂隙潜行开始。携带浓缩液: ' + amount);
+                var $controls = $('<div>').css({ display: 'flex', alignItems: 'center', gap: '10px' }).appendTo($row);
+                var maxAmount = Math.floor(baseConc);
+                var count = Math.min(10, maxAmount);
+
+                var $btnMinus = $('<button>').addClass('ee-btn').text('-').appendTo($controls);
+                var $val = $('<span>').css({ fontFamily: 'var(--font-terminal)', width: '30px', textAlign: 'center' }).text(count).appendTo($controls);
+                var $btnPlus = $('<button>').addClass('ee-btn').text('+').appendTo($controls);
+
+                $btnMinus.on('click', function () { if (count > 1) { count--; $val.text(count); } });
+                $btnPlus.on('click', function () { if (count < maxAmount && count < 99) { count++; $val.text(count); } });
+
+                var $btnContainer = $('<div>').css({ display: 'flex', gap: '10px', marginTop: '20px' }).appendTo($panel);
+
+                var $btnCancel = new Button.Button({
+                    id: 'btn-deploy-cancel',
+                    text: '取消',
+                    click: function () {
+                        $overlay.css('opacity', 0);
+                        setTimeout(function () { $overlay.remove(); }, 200);
+                    }
+                });
+                $btnContainer.append($btnCancel);
+
+                var $btnConfirm = new Button.Button({
+                    id: 'btn-deploy-confirm',
+                    text: '开始潜行',
+                    click: function () {
+                        $SM.add('stores.concentrate', -count);
+                        Survival.supplies = count;
+                        $overlay.css('opacity', 0);
+                        setTimeout(function () { $overlay.remove(); }, 200);
+
+                        if ($('#tab-rift_map').length > 0) {
+                            $('#tab-rift_map').click();
+                        } else {
+                            Engine.travelTo(RiftMap);
+                            if (typeof RiftMap !== 'undefined' && typeof RiftMap.show === 'function') RiftMap.show();
+                        }
+                        Notifications.notify('坐标锁定，裂隙潜行开始。携带浓缩液: ' + count);
+                    }
+                });
+                $btnConfirm.addClass('ee-btn--primary');
+                $btnContainer.append($btnConfirm);
+
+                setTimeout(function () { $overlay.css('opacity', 1); }, 10);
             }
         });
         $btnDeploy.addClass('ee-btn--primary').css({ 'width': '100%', 'marginTop': '15px' });

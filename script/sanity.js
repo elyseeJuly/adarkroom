@@ -71,7 +71,7 @@ var Sanity = {
                 click: function () { Sanity.actionInject(); }
             });
             $btnInject.css('margin-left', '10px');
-            $('<div>').addClass('ee-tooltip').text('强制重装心智防火墙。\n耗费: 浓缩液x2, 灰质x20\n效果: 理智重置为50, 侵蚀度-30').appendTo($btnInject);
+            $('<div>').addClass('ee-tooltip').text('强制重装心智防火墙。\n耗费: 浓缩液x2, 灰质x20\n效果: 理智重置为50%, 侵蚀度-30').appendTo($btnInject);
             $actionsOuter.append($btnInject);
         }
 
@@ -111,13 +111,15 @@ var Sanity = {
         if (Sanity._injectCooldown > 0) return;
         var conc = $SM.get('stores.concentrate') || 0;
         var gray = $SM.get('stores.grayMatter') || 0;
+        var maxSan = $SM.get('character.maxSan') || 100;
 
         if (conc < 2 || gray < 20) { Notifications.notify('抑制剂合成材料不足 (需 浓缩液x2, 灰质x20)。'); return; }
 
         // Execute action
+        var sanTarget = Math.floor(maxSan * 0.5);
         $SM.add('stores.concentrate', -2);
         $SM.add('stores.grayMatter', -20);
-        $SM.set('character.san', 50);
+        $SM.set('character.san', sanTarget);
         $SM.add('character.erosion', -30);
         Notifications.notify('抑制剂注入。冰冷的逻辑重新接管了大脑。');
 
@@ -233,8 +235,9 @@ var Sanity = {
             $SM.add('stores.ember', -2, true);
 
         } else {
-            // AWAKENED - Safe, drifts toward 50
-            var drift = (50 - san) * 0.01;
+            // AWAKENED - Safe, drifts toward 50% maxSan
+            var targetSan = maxSan * 0.5;
+            var drift = (targetSan - san) * 0.01;
             $SM.add('character.san', drift, true);
         }
 
@@ -331,19 +334,19 @@ var Sanity = {
         var threshold = maxSan - 30;
 
         if (san > threshold) {
-            $val.text(Math.floor(san) + ' / ' + maxSan);
+            $val.text('同化 (' + Math.floor(san) + ' / ' + maxSan + ')');
             $val.css('color', 'var(--ice-blue)');
-        } else if (san >= 50) {
-            $val.text('稳定 (' + Math.floor(san) + ')');
+        } else if (san >= maxSan * 0.5) {
+            $val.text('稳定 (' + Math.floor(san) + ' / ' + maxSan + ')');
             $val.css('color', 'var(--ash-gray)');
         } else if (san >= 30) {
-            $val.text('动摇 (' + Math.floor(san) + ')');
+            $val.text('动摇 (' + Math.floor(san) + ' / ' + maxSan + ')');
             $val.css('color', 'var(--ember-orange)');
         } else if (san >= 15) {
-            $val.text('边缘崩溃 (' + Math.floor(san) + ')');
+            $val.text('边缘崩溃 (' + Math.floor(san) + ' / ' + maxSan + ')');
             $val.css('color', 'var(--blood-red)');
         } else {
-            $val.text('█̷̢̛̤̪ↂ̶̧̛ↂ̴̛̤̪');
+            $val.text('█̷̢̛̤̪ↂ̶̧̛ↂ̴̛̤̪ (' + Math.floor(san) + ' / ' + maxSan + ')');
             $val.css('color', 'var(--blood-red)');
         }
     },
