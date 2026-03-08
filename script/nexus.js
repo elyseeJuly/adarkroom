@@ -73,8 +73,7 @@ var Nexus = {
             },
             availablePhase: Engine.PHASES.ABYSS,
             onBuild: function () {
-                $SM.add('character.maxSan', 10);
-                var newMax = $SM.get('character.maxSan') || 110;
+                var newMax = (typeof Sanity !== 'undefined' && Sanity.getMaxSan) ? Sanity.getMaxSan() : 100;
                 Notifications.notify('认知屏障构筑完成。理智上限提升至 ' + newMax + '。混沌的低语变得遥远了。');
             }
         },
@@ -232,8 +231,10 @@ var Nexus = {
 
     name: '营地',
     tabId: 'tab-nexus',
+    _hideTimeout: null,
 
     show: function () {
+        if (Nexus._hideTimeout) clearTimeout(Nexus._hideTimeout);
         $('#nexus-panel').show();
         // Allow a tiny delay for display:block to apply before adding class to trigger the CSS transition
         setTimeout(function () { $('#nexus-panel').addClass('visible'); }, 10);
@@ -245,7 +246,7 @@ var Nexus = {
 
     hide: function () {
         $('#nexus-panel').removeClass('visible');
-        setTimeout(function () { $('#nexus-panel').hide(); }, 300); // 300ms matches --transition-slow
+        Nexus._hideTimeout = setTimeout(function () { $('#nexus-panel').hide(); }, 300); // 300ms matches --transition-slow
         if (typeof Population !== 'undefined') Population.hide();
     },
 

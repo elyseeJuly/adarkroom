@@ -111,7 +111,7 @@ var Sanity = {
         if (Sanity._injectCooldown > 0) return;
         var conc = $SM.get('stores.concentrate') || 0;
         var gray = $SM.get('stores.grayMatter') || 0;
-        var maxSan = $SM.get('character.maxSan') || 100;
+        var maxSan = Sanity.getMaxSan();
 
         if (conc < 2 || gray < 20) { Notifications.notify('抑制剂合成材料不足 (需 浓缩液x2, 灰质x20)。'); return; }
 
@@ -212,7 +212,7 @@ var Sanity = {
      */
     tick: function () {
         var san = $SM.get('character.san') || 50;
-        var maxSan = $SM.get('character.maxSan') || 100;
+        var maxSan = Sanity.getMaxSan();
         var erosion = $SM.get('character.erosion') || 0;
         var zone = Sanity.getZone(san, maxSan);
 
@@ -295,7 +295,7 @@ var Sanity = {
     updateVisuals: function () {
         var $body = $('body');
         var san = $SM.get('character.san') || 50;
-        var maxSan = $SM.get('character.maxSan') || 100;
+        var maxSan = Sanity.getMaxSan();
         var zone = Sanity.getZone(san, maxSan);
 
         $body.removeClass('glitch-blood rigid-code mind-break-active');

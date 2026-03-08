@@ -147,7 +147,7 @@ var StateManager = {
 
 		// SAN clamped to [0, maxSan]
 		if (stateName === 'character.san') {
-			var maxSan = this.get('character.maxSan') || 100;
+			var maxSan = (typeof Sanity !== 'undefined' && Sanity.getMaxSan) ? Sanity.getMaxSan() : 100;
 			newVal = Math.max(0, Math.min(maxSan, newVal));
 		}
 
@@ -268,7 +268,7 @@ var StateManager = {
 	collectIncome: function () {
 		var workers = this.get('workers') || {};
 		var san = this.get('character.san') || 50;
-		var maxSan = this.get('character.maxSan') || 100;
+		var maxSan = (typeof Sanity !== 'undefined' && Sanity.getMaxSan) ? Sanity.getMaxSan() : 100;
 		var assimilationThreshold = maxSan - 30;
 		var productionMultiplier = (san > assimilationThreshold) ? 1.5 : 1.0;
 
