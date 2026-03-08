@@ -97,6 +97,10 @@ var Population = {
         // Show if phase is CAMP or higher
         if (Engine.getPhase() >= Engine.PHASES.CAMP) {
             Population.startPopGrowth();
+            // If we loaded late and Nexus is already the active module, make sure we show immediately
+            if (typeof Nexus !== 'undefined' && Engine.activeModule === Nexus) {
+                Population.show();
+            }
         }
 
         // Subscribe to events

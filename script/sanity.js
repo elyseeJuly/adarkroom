@@ -269,12 +269,18 @@ var Sanity = {
 
     getZone: function (san, maxSan) {
         if (san === undefined) san = $SM.get('character.san') || 50;
-        if (maxSan === undefined) maxSan = $SM.get('character.maxSan') || 100;
+        if (maxSan === undefined) maxSan = Sanity.getMaxSan();
 
         if (san <= 0) return 'mindbreak';
         if (san < Sanity.MADNESS_THRESHOLD) return 'madness';
         if (san > (maxSan - 30)) return 'assimilation';
         return 'awakened';
+    },
+
+    getMaxSan: function () {
+        var base = 100;
+        var bonus = ($SM.get('buildings.cognitiveBarrier') || 0) * 10;
+        return base + bonus;
     },
 
     onZoneChange: function (from, to) {
